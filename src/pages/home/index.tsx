@@ -58,7 +58,7 @@ export default function Home() {
 
   const _renderCard = (item: PropCard, index: number) => {
     const color =
-      item.flag == "opcional" ? themas.Colors.blueLigth : themas.Colors.red;
+      item.flag == "Day use" ? themas.Colors.blueLigth : themas.Colors.red;
     return (
       <Swipeable
         ref={(ref) => (swipeableRefs.current[index] = ref)}

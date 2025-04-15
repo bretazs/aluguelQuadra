@@ -10,7 +10,7 @@ export const style = StyleSheet.create({
         borderRadius: 12,
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         gap: 10,
         paddingBottom:-50
     },
@@ -18,7 +18,8 @@ export const style = StyleSheet.create({
         height:'100%',
         width:'100%',
         borderRadius:40,
-        color:'#757575'
+        color:'#757575',
+        alignItems:'center'
         
   
     },

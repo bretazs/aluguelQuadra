@@ -14,4 +14,4 @@ type PropCard = {
 	title: string
 }
 
-type PropFlags = 'urgente'|'opcional'
+type PropFlags = 'Mensalista'|'Day use'
