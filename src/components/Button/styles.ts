@@ -4,7 +4,7 @@ import { themas } from "../../global/themes";
 
 export const style = StyleSheet.create({
     button:{
-        width:200,
+        width:215,
         height:50,
         alignItems:'center',
         justifyContent:'center',

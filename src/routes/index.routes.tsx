@@ -1,10 +1,10 @@
 import React from "react";
 import { createStackNavigator } from '@react-navigation/stack';
-
 import Login from "../pages/login";
 import Cadastro from "../pages/cadastro"; 
 import Home from "../pages/home";
 import BottomRoutes from "./bottom.routes";
+import resetPassword from "../pages/resetPassword";
 
 export default function Routes() {
   const Stack = createStackNavigator();
@@ -31,6 +31,10 @@ export default function Routes() {
         name="Cadastro" 
         component={Cadastro}
       />
+       <Stack.Screen
+        name="resetPassword" 
+        component={resetPassword}
+      /> 
       <Stack.Screen
         name="BottomRoutes"
         component={BottomRoutes}

@@ -82,14 +82,14 @@ export const AuthProviderList = (props) => {
             const storedData = await AsyncStorage.getItem('taskList');
             let taskList = storedData ? JSON.parse(storedData) : [];
     
-            // Verifica se o item já existe no array
+           
             const itemIndex = taskList.findIndex((task) => task.item === newItem.item);
     
             if (itemIndex >= 0) {
-                // Substitui o item existente pelo novo
+                
                 taskList[itemIndex] = newItem;
             } else {
-                // Adiciona o novo item ao array
+               
                 taskList.push(newItem);
             }
     
@@ -259,10 +259,10 @@ export const AuthProviderList = (props) => {
                                 setShow={setShowDatePicker} 
                             />
                             <CustomDateTimePicker 
-                                type='time' // Mude para 'time' aqui
+                                type='time'
                                 onDateChange={handleTimeChange} 
-                                show={showTimePicker} // Use showTimePicker aqui
-                                setShow={setShowTimePicker} // Use setShowTimePicker aqui
+                                show={showTimePicker} 
+                                setShow={setShowTimePicker} 
                             />
 
                         <View style={styles.containerFlag}>

@@ -11,6 +11,7 @@ export const style = StyleSheet.create({
     },
     header:{
         width:'100%',
+        paddingTop:25,
         height:Dimensions.get('window').height/6,
         backgroundColor:'#181a20',
         // alignItems:'center',
@@ -23,11 +24,12 @@ export const style = StyleSheet.create({
         fontSize:20,
         color:'#FFF',
         marginTop:20,
-        paddingBottom:10
+        paddingBottom:9
     },
     boxInput:{
         width:'80%',
         color:'#FFF',
+        
         
     },
     boxList:{

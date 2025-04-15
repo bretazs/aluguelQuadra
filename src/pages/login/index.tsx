@@ -6,14 +6,14 @@ import { Button } from "../../components/Button";
 import { Text, View, Image, Alert } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { MaterialIcons, Octicons } from '@expo/vector-icons';
-
 import { signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail,  } from "firebase/auth";
 import { auth } from "../../services/fiireBaseConfig"; 
+
 
 export default function Login() {
   const navigation = useNavigation<NavigationProp<any>>();
   const [email, setEmail] = useState('pgbretas@gmail.com');
-  const [password, setPassword] = useState('Bretas12');
+  const [password, setPassword] = useState('Bretas13');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -41,30 +41,7 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-  }
-
-  const handleResetPassword = async () => {
-    if (!email) {
-      return Alert.alert("Atenção", "Informe seu e-mail para redefinir a senha.");
-    }
-  
-    const emailClean = email.trim().toLowerCase();
-  
-    try {
-      const methods = await fetchSignInMethodsForEmail(auth, emailClean);
-  
-      if (methods.length === 0) {
-        console.log("Nenhuma conta encontrada para o e-mail:", emailClean);
-        return Alert.alert("Erro", "Este e-mail não está cadastrado.");
-      }
-  
-      await sendPasswordResetEmail(auth, emailClean);
-      Alert.alert("Sucesso", "Verifique sua caixa de entrada para redefinir sua senha.");
-    } catch (error) {
-      console.log("Erro ao enviar e-mail:", error);
-      Alert.alert("Erro", "Não foi possível enviar o e-mail de redefinição.");
-    }
-  };
+  } 
   
   
   return (
@@ -97,12 +74,12 @@ export default function Login() {
           multiline={false}
         />
 
-        <Text
+         <Text
           style={style.forgotPasswordText}
-          onPress={handleResetPassword}
+          onPress={()=>navigation.reset({ routes:[{name: 'resetPassword'}]})}
         >
           Esqueceu a senha?
-        </Text>
+        </Text>  
       </View>
 
       <View style={style.boxBottom}>

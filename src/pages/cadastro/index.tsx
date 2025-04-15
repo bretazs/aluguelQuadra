@@ -40,8 +40,11 @@ export default function Cadastro() {
 
     try {
       setLoading(true);
-      await createUserWithEmailAndPassword(auth, email, password);
-
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+    
+      console.log('Usuário cadastrado:', user.email); 
+    
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
@@ -54,6 +57,7 @@ export default function Cadastro() {
     } finally {
       setLoading(false);
     }
+    
   }
 
   return (

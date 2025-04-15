@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     alignItems: "center",
+    paddingTop:120
   },
   avatar: {
     width: 120,
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     flexDirection: "row",
-    alignItems: "center",
+    left:150,
     marginTop: 40,
     gap: 8,
   },

@@ -12,12 +12,14 @@ export const style = StyleSheet.create({
         alignItems: "center",
         paddingHorizontal: 20,
         gap: 10,
+        paddingBottom:-50
     },
     input:{
         height:'100%',
         width:'100%',
         borderRadius:40,
         color:'#757575'
+        
   
     },
     titleInput:{
