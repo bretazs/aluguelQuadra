@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     flexDirection: "row",
     left:150,
-    marginTop: 42,
+    marginTop: 40,
     gap: 8,
   },
   section: {
