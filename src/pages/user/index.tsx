@@ -9,132 +9,313 @@ import {
   TextInput,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons, Feather, MaterialIcons } from "@expo/vector-icons";
-import { auth } from "../../services/fiireBaseConfig";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useFonts } from 'expo-font';
+
 import * as ImagePicker from "expo-image-picker";
-import { updateProfile, User } from "firebase/auth";
-import { sendPasswordResetEmail } from "firebase/auth";
+import { supabase } from "../../libs/supabase";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import * as FileSystem from "expo-file-system";
+import { decode as atob } from "base-64";
 
-
-const PerfilScreen = () => {
-
-    const handleResetPassword = async () => {
-        try {
-          await sendPasswordResetEmail(auth, user.email!);
-          Alert.alert("Email enviado", "Verifique sua caixa de entrada para redefinir sua senha.");
-        } catch (error) {
-          console.log("Erro ao enviar email:", error);
-          Alert.alert("Erro", "Não foi possível enviar o email de redefinição.");
-        }
-      };
-      
+export default function PerfilScreen() {
+  const { setAuth } = useAuth();
   const navigation = useNavigation<NavigationProp<any>>();
-  const user = auth.currentUser as User;
-
+  const [user, setUser] = useState<any>(null);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newName, setNewName] = useState(user.displayName || "");
-
-  const storageKey = `@user_photo_${user.uid}`;
+  const [newName, setNewName] = useState("");
+  const [loading, setLoading] = useState(true);
+  
+  const [photoModalVisible, setPhotoModalVisible] = useState(false);
 
   useEffect(() => {
-    const loadPhoto = async () => {
-      const uri = await AsyncStorage.getItem(storageKey);
-      if (uri) setPhotoUri(uri);
+    const fetchUserAndAvatar = async () => {
+      setLoading(true);
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const session = sessionData.session;
+
+        if (!session?.user) {
+          setUser(null);
+          return;
+        }
+
+        const currentUser = session.user;
+        setUser(currentUser);
+        setNewName(currentUser.user_metadata?.name || "");
+
+        const { data: userData, error } = await supabase
+          .from("users")
+          .select("avatar_url")
+          .eq("id", currentUser.id)
+          .single();
+
+        if (!error && userData?.avatar_url) {
+          setPhotoUri(userData.avatar_url);
+        } else {
+          setPhotoUri(null);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar dados:", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    loadPhoto();
+
+    fetchUserAndAvatar();
+
+    const authListener = supabase.auth.onAuthStateChange(() => {
+      fetchUserAndAvatar();
+    });
+
+    return () => {
+      authListener.data?.subscription?.unsubscribe();
+    };
   }, []);
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert("Permissão negada", "Precisamos do acesso às fotos.");
-      return;
+      return Alert.alert("Permissão negada", "Precisamos do acesso às fotos.");
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
+      base64: false,
+      allowsEditing: true, // <-- Adicione esta linha
+  aspect: [1, 1], 
     });
 
-    if (!result.canceled) {
+    if (!result.canceled && user?.id) {
       const uri = result.assets[0].uri;
-      setPhotoUri(uri);
-      await AsyncStorage.setItem(storageKey, uri);
+      const extension = uri.split(".").pop() || "jpg";
+      const fileName = `avatar-${user.id}.${extension}`;
+      const pathInBucket = `files/${fileName}`;
+      const mimeType = `image/${extension}`;
+
+      try {
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        const binaryString = atob(base64);
+        const fileBuffer = Uint8Array.from(binaryString, (char: string) =>
+          char.charCodeAt(0)
+        );
+
+        const { error: uploadError } = await supabase.storage
+          .from("files")
+          .upload(pathInBucket, fileBuffer, {
+            contentType: mimeType,
+            upsert: true,
+          });
+
+        if (uploadError) {
+          return Alert.alert("Erro", "Erro ao enviar imagem.");
+        }
+
+        const { data: urlData } = supabase
+          .storage
+          .from("files")
+          .getPublicUrl(pathInBucket);
+
+        const publicUrl = `${urlData.publicUrl}?ts=${Date.now()}`;
+        setPhotoUri(publicUrl);
+
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({ avatar_url: publicUrl })
+          .eq("id", user.id);
+
+        if (updateError) {
+          return Alert.alert("Erro", "Erro ao atualizar imagem.");
+        }
+
+        Alert.alert("Sucesso", "Imagem atualizada!");
+      } catch (err) {
+        Alert.alert("Erro", "Erro ao processar imagem.");
+      }
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Login" }],
-      });
-    } catch (error) {
-      console.log("Erro ao sair:", error);
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      return Alert.alert("Permissão negada", "Precisamos de acesso à câmera.");
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 1,
+      base64: false,
+      aspect: [1, 1], 
+
+    });
+
+    if (!result.canceled && user?.id) {
+      const uri = result.assets[0].uri;
+      const extension = uri.split(".").pop() || "jpg";
+      const fileName = `avatar-${user.id}.${extension}`;
+      const pathInBucket = `files/${fileName}`;
+      const mimeType = `image/${extension}`;
+
+      try {
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        const binaryString = atob(base64);
+        const fileBuffer = Uint8Array.from(binaryString, (char: string) =>
+          char.charCodeAt(0)
+        );
+
+        const { error: uploadError } = await supabase.storage
+          .from("files")
+          .upload(pathInBucket, fileBuffer, {
+            contentType: mimeType,
+            upsert: true,
+          });
+
+        if (uploadError) {
+          return Alert.alert("Erro", "Erro ao enviar imagem.");
+        }
+
+        const { data: urlData } = supabase
+          .storage
+          .from("files")
+          .getPublicUrl(pathInBucket);
+
+        const publicUrl = `${urlData.publicUrl}?ts=${Date.now()}`;
+        setPhotoUri(publicUrl);
+
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({ avatar_url: publicUrl })
+          .eq("id", user.id);
+
+        if (updateError) {
+          return Alert.alert("Erro", "Erro ao atualizar imagem.");
+        }
+
+        Alert.alert("Sucesso", "Imagem atualizada!");
+      } catch (err) {
+        Alert.alert("Erro", "Erro ao processar imagem.");
+      }
     }
   };
 
   const handleSaveName = async () => {
-    try {
-      await updateProfile(user, { displayName: newName });
+    const { error } = await supabase.auth.updateUser({
+      data: { name: newName },
+    });
+
+    if (error) {
+      Alert.alert("Erro", "Não foi possível atualizar o nome");
+    } else {
       setModalVisible(false);
-    } catch (error) {
-      console.log("Erro ao atualizar nome:", error);
+      Alert.alert("Sucesso", "Nome atualizado com sucesso!");
     }
   };
 
-  const creationDate = user.metadata.creationTime
-    ? new Date(user.metadata.creationTime).toLocaleDateString()
+  const handleResetPassword = async () => {
+    const { error } = await supabase.auth.resetPasswordForEmail(user?.email);
+    if (error) {
+      Alert.alert("Erro", "Erro ao enviar e-mail.");
+    } else {
+      Alert.alert("Verifique seu e-mail", "Link de redefinição enviado.");
+    }
+  };
+
+  const handleSignout = async () => {
+    const { error } = await supabase.auth.signOut();
+    setAuth(null);
+    if (error) {
+      Alert.alert("Erro", "Erro ao sair da conta.");
+    }
+    navigation.navigate("signin");
+  };
+
+  const creationDate = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString()
     : "N/A";
 
+  if (loading) {
+    return (
+      <View style={[styles.container, { flex: 1, justifyContent: "center" }]} >
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: "#fff" }}>Usuário não encontrado.</Text>
+      </View>
+    );
+  }
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#1f222a" }}>
+      <Text style={styles.txtPerfil}>Configuração</Text>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+        <TouchableOpacity
+          style={styles.filesContainer}
+          onPress={() => {
+            Alert.alert(
+              "Escolha uma opção",
+              "Selecione de onde você quer pegar a foto",
+              [
+                { text: "Selecionar Fotos...", onPress: pickImage },
+                { text: "Tirar Foto", onPress: takePhoto },
+                { text: "Cancelar", style: "cancel" },
+              ],
+              { cancelable: true }
+            );
+          }}
+        >
           {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.avatar} />
+            <Image source={{ uri: photoUri }} style={styles.files} />
           ) : (
             <Ionicons name="person-circle" size={120} color="#ccc" />
           )}
-          <Text style={styles.txtImg}>Toque para mudar a foto</Text>
         </TouchableOpacity>
-
-        <Text style={styles.name}>{user.displayName || "Nome não definido"}</Text>
-        <Text style={styles.email}>{user.email}</Text>
-
-        <View style={styles.infoBox}>
-          <Ionicons name="calendar" size={20} color="#ccc" />
-          <Text style={styles.infoText}>Conta criada em: {creationDate}</Text>
+  
+        <View style={styles.cardInfo}>
+          <Text style={styles.name}>
+            {user.user_metadata?.name || "Nome não definido"}
+          </Text>
+          <Text style={styles.email}>{user.email}</Text>
+          <Text style={styles.id}>ID: {user.id}</Text>
+  
+          <View style={styles.infoBox}>
+            <Ionicons name="calendar" size={20} color="#ccc" />
+            <Text style={styles.infoText}>Conta criada em: {creationDate}</Text>
+          </View>
         </View>
-
-        <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
+  
+        <Text style={styles.sectionTitle}>Ações</Text>
+  
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setModalVisible(true)}
+        >
           <Feather name="edit-2" size={18} color="#fff" />
           <Text style={styles.buttonText}>Editar Nome</Text>
         </TouchableOpacity>
-
+  
         <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
-  <MaterialIcons name="lock-outline" size={20} color="#fff" />
-  <Text style={styles.buttonText}>Trocar Senha</Text>
-</TouchableOpacity>
-
-
-        <View style={styles.section}>
-          <View style={styles.configItem}>
-          </View>
-          <View style={styles.configItem}>
-          </View>
-        </View>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons name="exit-outline" color="gray" size={28} />
+          <MaterialIcons name="lock-outline" size={20} color="#fff" />
+          <Text style={styles.buttonText}>Trocar Senha</Text>
+        </TouchableOpacity>
+  
+        <TouchableOpacity style={styles.logoutButton} onPress={handleSignout}>
+          <Ionicons name="exit-outline" color="gray" size={24} />
           <Text style={{ color: "gray", fontSize: 16 }}>Sair</Text>
         </TouchableOpacity>
-
+  
         <Modal visible={modalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
@@ -161,37 +342,48 @@ const PerfilScreen = () => {
       </View>
     </ScrollView>
   );
-};
-
-export default PerfilScreen;
+}  
 
 const styles = StyleSheet.create({
+  txtPerfil: {
+    color: '#fff',
+    fontSize: 26,
+    fontWeight: 'bold',
+    paddingTop: 80,
+    paddingBottom: 20,
+    textAlign: 'left',
+    marginLeft:20
+  },
   container: {
     alignItems: "center",
-    padding: 20,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
   },
-  avatarContainer: {
+  filesContainer: {
     alignItems: "center",
-    paddingTop:120
+    marginBottom: 20,
+    paddingTop:20
   },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+  files: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
     marginBottom: 10,
-    borderWidth: 2,
-    borderColor: "#fff",
+    borderWidth: 3,
+    borderColor: "#00d4ff",
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     color: "#fff",
     fontWeight: "bold",
     marginTop: 10,
+    textAlign: "center",
   },
   email: {
     fontSize: 16,
-    color: "#ccc",
-    marginBottom: 15,
+    color: "#aaa",
+    marginBottom: 20,
+    textAlign: "center",
   },
   txtImg: {
     color: "#fff",
@@ -202,7 +394,7 @@ const styles = StyleSheet.create({
   infoBox: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   infoText: {
     marginLeft: 8,
@@ -212,43 +404,28 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2c2f36",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    backgroundColor: "#31343d",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
     marginTop: 12,
     gap: 10,
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
+    fontWeight: "500",
   },
   logoutButton: {
     flexDirection: "row",
-    alignItems:'center',
-    left:150,
-    marginTop: 40,
-    gap: 8,
-  },
-  section: {
-    width: "100%",
-    marginTop: 30,
-  },
-  sectionTitle: {
-    color: "#fff",
-    fontSize: 18,
-    marginBottom: 10,
-    fontWeight: "bold",
-  },
-  configItem: {
-    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    left:130,
+    marginTop: 40,
+    backgroundColor: "#292c35",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
     gap: 10,
-  },
-  configText: {
-    color: "#ccc",
-    fontSize: 15,
   },
   modalOverlay: {
     flex: 1,
@@ -259,21 +436,51 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: "85%",
     backgroundColor: "#2c2f36",
-    padding: 20,
-    borderRadius: 10,
+    padding: 24,
+    borderRadius: 12,
     alignItems: "center",
   },
   modalTitle: {
     color: "#fff",
     fontSize: 20,
+    fontWeight: "bold",
     marginBottom: 15,
   },
   input: {
     width: "100%",
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#666",
     color: "#fff",
     marginBottom: 20,
-    paddingVertical: 5,
+    paddingVertical: 8,
+    fontSize: 16,
   },
+  cardInfo: {
+    backgroundColor: "#2a2d36",
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+    width: "100%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  id: {
+    fontSize: 12,
+    color: "#777",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  sectionTitle: {
+    color: "#ccc",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    alignSelf: "flex-start",
+  },
+
 });
+

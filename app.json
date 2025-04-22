@@ -1,6 +1,7 @@
 {
   "expo": {
-    
+    "scheme": "myapp", 
+    "deepLinking": true,
     "name": "lista",
     "slug": "lista",
     "version": "1.0.0",
@@ -23,6 +24,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-font"
+    ]
   }
 }

@@ -1,0 +1,5 @@
+export const supaUrl = 'https://feyfovivebdgusdnzhgl.supabase.co'
+
+export const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZleWZvdml2ZWJkZ3VzZG56aGdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ4NDg2OTcsImV4cCI6MjA2MDQyNDY5N30.H4dU7pg9xSWqiuwJ41ZuU3tsgJTNBcK5MRwrSZXtGBY'
+
+export const files = "avatars";

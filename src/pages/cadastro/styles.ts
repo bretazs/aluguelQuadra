@@ -5,10 +5,12 @@ import { themas } from "../../global/themes";
 
 export const styles = StyleSheet.create({
     container: {
-      flex: 1,
+      flexGrow: 1,
       paddingHorizontal: 24,
       justifyContent: 'center',
-      backgroundColor:'#181a20'
+      backgroundColor:'#000028',
+      paddingTop: 60,
+      alignItems: 'center',
       
     },
     boxTop: {

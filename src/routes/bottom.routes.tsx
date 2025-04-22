@@ -1,17 +1,20 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from '../pages/home';
 import User from '../pages/user';
+import Agendamento from '../components/Agendamento'
 import CustomTabBar from '../components/CustomTabBar';
 import { AuthProviderList } from '../context/authContext_list';
+
 const Tab = createBottomTabNavigator();
 
 export default function BottomRoutes() {
   return (
     <AuthProviderList>
       <Tab.Navigator
-        screenOptions={{headerShown:false}}
-        tabBar={props=><CustomTabBar{ ...props}/>}
-      >
+        id={undefined}
+        screenOptions={{ headerShown: false }}
+        tabBar={(props) => <CustomTabBar {...props} />}
+      >  
         <Tab.Screen 
           name="Home" 
           component={Home} 
@@ -20,7 +23,11 @@ export default function BottomRoutes() {
           name="User"
           component={User} 
         />
+        <Tab.Screen 
+          name="Agendamento"
+          component={Agendamento} 
+        />
       </Tab.Navigator>
-      </AuthProviderList>
+    </AuthProviderList>
   );
 }

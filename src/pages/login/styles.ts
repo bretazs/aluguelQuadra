@@ -7,7 +7,40 @@ export const style = StyleSheet.create({
         flex:1,
         alignItems:'center',
         justifyContent:'center',
-        backgroundColor:'#181a20'
+        backgroundColor:'#000028'
+    },
+    txtEmail:{
+        flex: 1,
+        height: "100%",
+        width: "100%",
+        borderRadius: 40,
+        paddingVertical: 0,
+        textAlignVertical: "center", 
+        textAlign: 'left', 
+        color: "#757575",
+        fontSize: 18,
+        marginTop: -2,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingBottom: 0, 
+        paddingTop: 0,
+    },
+
+    txtSenha:{
+        flex: 1,
+        height: "100%",
+        width: "100%",
+        borderRadius: 40,
+        paddingVertical: 0,
+        textAlignVertical: "center", 
+        textAlign: 'left', 
+        color: "#757575",
+        fontSize: 18,
+        marginTop: 2,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingBottom: 0, 
+        paddingTop: 0, 
     },
     boxTop:{
         height:Dimensions.get('window').height/3,
@@ -19,14 +52,15 @@ export const style = StyleSheet.create({
         height:Dimensions.get('window').height/4,
         width:'100%',
         paddingHorizontal:37,
-        gap:5
+        gap:5,   
     },
     boxBottom:{
         height:Dimensions.get('window').height/3,
         width:'100%',
         alignItems:'center',
         justifyContent:'flex-start',
-        paddingTop:40
+        paddingTop:40,
+        
         
         
     },
@@ -41,6 +75,7 @@ export const style = StyleSheet.create({
         flexDirection:'row',
         alignItems:'center',
         paddingHorizontal:30,
+        justifyContent:'center'
     },
     logo:{
         width:80,
@@ -58,17 +93,22 @@ export const style = StyleSheet.create({
         height:'100%',
         width:'100%',
         borderRadius:40,
+        
 
     },
     boxIcon:{
         width:50,
         height:50,
-        backgroundColor:'red'
+        backgroundColor:'red',
+        alignItems:'center',
+        justifyContent:'center'
     },
     titleInput:{
         marginLeft:5,
         color:themas.Colors.gray,
-        marginTop:20
+        marginTop:20,
+        alignItems:'center',
+        justifyContent:'center'
     },
     textBottom:{
         fontSize: 18,

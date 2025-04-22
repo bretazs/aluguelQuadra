@@ -6,7 +6,23 @@ export const styles = StyleSheet.create({
         flex:1,
         alignItems:'center',
         justifyContent:'center',
-        backgroundColor:'#181a20'
+        backgroundColor:'#000028'
+    },
+    txtEmail:{
+        flex: 1,
+        height: "100%",
+        width: "100%",
+        borderRadius: 40,
+        paddingVertical: 0,
+        textAlignVertical: "center", 
+        textAlign: 'left', 
+        color: "#757575",
+        fontSize: 18,
+        marginTop: -2,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingBottom: 0, 
+        paddingTop: 0,
     },
     boxTop:{
         height:Dimensions.get('window').height/3,
@@ -52,7 +68,8 @@ export const styles = StyleSheet.create({
         width:'100%',
         alignItems:'center',
         justifyContent:'flex-start',
-        paddingTop:6
+        paddingTop:-30,
+        marginBottom: 20,
     }
 
 })

@@ -12,7 +12,7 @@ import { Input } from "../components/Input";
 import { Modalize } from "react-native-modalize";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import CustomDateTimePicker from "../components/CustomDateTimePicker";
+
 import {
   TouchableOpacity,
   Text,
@@ -24,6 +24,8 @@ import {
 } from "react-native";
 import { Loading } from "../components/Loading";
 
+
+
 type AuthContextProps = {
   onOpen: () => void;
   taskList: PropCard[];
@@ -33,8 +35,12 @@ type AuthContextProps = {
   filter: (text: string) => void;
   username: string;
   setUsername: (name: string) => void;
+  
+  
 };
 export const AuthContextList: any = createContext({});
+
+
 
 const flags = [
   { caption: "Mensalista", color: themas.Colors.red },
@@ -275,18 +281,7 @@ export const AuthProviderList = (props) => {
               </TouchableOpacity>
             </View>
 
-            <CustomDateTimePicker
-              type="date"
-              onDateChange={handleDateChange}
-              show={showDatePicker}
-              setShow={setShowDatePicker}
-            />
-            <CustomDateTimePicker
-              type="time"
-              onDateChange={handleTimeChange}
-              show={showTimePicker}
-              setShow={setShowTimePicker}
-            />
+           
 
             <View style={styles.containerFlag}>
               <Text style={styles.flag}>Flags:</Text>

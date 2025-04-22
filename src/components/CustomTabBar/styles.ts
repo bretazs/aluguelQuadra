@@ -4,7 +4,7 @@ import { themas } from "../../global/themes";
 export const style =StyleSheet.create({
     TabArea:{
        height:80,
-       backgroundColor:'#181a20',
+       backgroundColor:'#000028',
        flexDirection:'row',
        borderTopColor: 'black',
        shadowColor: "#000",
@@ -27,11 +27,9 @@ export const style =StyleSheet.create({
         borderRadius:40,
         justifyContent:'center',
         alignItems:'center',
-        // borderWidth:1,
         top:-30,
         zIndex:9999,
-        backgroundColor:'#063940',
-        // paddingHorizontal:20
+        backgroundColor:'#3e838c',
     },
     row:{
         width:'100%',

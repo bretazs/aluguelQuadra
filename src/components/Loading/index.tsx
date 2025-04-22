@@ -1,14 +1,17 @@
 import React from "react";
+import { ActivityIndicator, View } from 'react-native';
 import { style } from "./styles";
-import {ActivityIndicator, View}from 'react-native';
+
 type Props = {
-    loading:boolean
-}
-export  function Loading({...rest}:Props){
-    if(!rest.loading)return <></>
-    return(
-      <View style={style.container}>
-        <ActivityIndicator  color={'white'} size={24}/>
-      </View>
+    loading: boolean;
+};
+
+export function Loading({ loading }: Props) {
+    if (!loading) return null; 
+
+    return (
+        <View style={style.container}>
+            <ActivityIndicator color={'white'} size={24} />
+        </View>
     );
 }

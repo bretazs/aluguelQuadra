@@ -88,17 +88,22 @@ export const Input = forwardRef(
             </TouchableOpacity>
           )}
           <TextInput
-            style={[
-              style.input,
-              { width: calculateSizeWidth(), height: "100%" },
-            ]}
-            ref={ref}
-            multiline={props.multiline ?? false}
-            submitBehavior="blurAndSubmit"
-            returnKeyType="done"
-            onSubmitEditing={props.onSubmitEditing}
-            {...rest}
-          />
+  style={[
+    style.input,
+    { flex: 1, height: "100%" }, 
+  ]}
+  ref={ref}
+  multiline={props.multiline ?? false}
+  submitBehavior="blurAndSubmit"
+  returnKeyType="done"
+  onSubmitEditing={props.onSubmitEditing}
+  autoComplete="off"
+  autoCorrect={false}
+  textContentType="none"
+  importantForAutofill="no"
+  {...rest}
+/>
+
 
           {IconRigth && iconRightName && (
             <TouchableOpacity onPress={onIconRigthPress} style={style.Button}>
