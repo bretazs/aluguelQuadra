@@ -14,7 +14,7 @@ export const style = StyleSheet.create({
   header: {
     width: '100%',
     paddingTop: 60,
-    height: height / 5,
+    height: height / 4.7,
     backgroundColor: '#000028',
     justifyContent: 'flex-start',
     paddingHorizontal: 20,

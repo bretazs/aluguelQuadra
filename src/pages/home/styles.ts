@@ -12,10 +12,11 @@ export const style = StyleSheet.create({
     header: {
       width: '100%',
       paddingTop: 60,
-      height: height / 5,
+      height: height / 4.7,
       backgroundColor: '#000028',
       justifyContent: 'flex-start',
       paddingHorizontal: 20,
+      marginBottom:20
     },
     greeting: {
       fontSize: 20,
@@ -85,12 +86,31 @@ export const style = StyleSheet.create({
         backgroundColor: "#e0e0e0",
         
     },
-    // txtProximas:{
-    //   color:'#fff',
-    //   paddingBottom:400,
-    //   alignItems:'center',
-    //   fontSize:17,
-    //   fontWeight: 'bold'
-    // }
+    arenaCard:{
+     width:200,
+     height:50,
+    flexDirection:'row',
+     alignItems:'center',
+     right:75,
+     justifyContent:'space-between',
+     borderRadius:8,
+     backgroundColor:'#87CEF6',
+     paddingHorizontal:15,
+     marginTop:35
+    },
+    txtArena:{
+      color:'#fff',
+      fontSize:18,
+    },
+    txtBtn:{
+      color:'#43f3',
+      fontSize:18,
+    },
+    btnModal:{
+      alignItems:'center',
+      justifyContent:'center',
+      padding:15,
+      borderRadius:7
+    }
   });
   
