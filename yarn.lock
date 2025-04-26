@@ -1594,6 +1594,14 @@
     "@react-navigation/elements" "^2.3.8"
     warn-once "^0.1.1"
 
+"@react-navigation/native-stack@^7.3.10":
+  version "7.3.10"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.3.10.tgz#80553b5ccaf27dcf1b67d3d93d7e73fdd985d29f"
+  integrity sha512-bO/3bZiL/i2dbJQEeqfxIqp1CKzyx+RPdwaiLm6za8cUl877emnxFeAAOSUbN7r/AJgq+U/iCwc3K88mh+4oRQ==
+  dependencies:
+    "@react-navigation/elements" "^2.3.8"
+    warn-once "^0.1.1"
+
 "@react-navigation/native@^7.0.14":
   version "7.1.6"
   resolved "https://registry.npmjs.org/@react-navigation/native/-/native-7.1.6.tgz"
@@ -5139,6 +5147,11 @@ react-native-screens@~4.4.0:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-swipe-gestures@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/react-native-swipe-gestures/-/react-native-swipe-gestures-1.0.5.tgz#a172cb0f3e7478ccd681fd36b8bfbcdd098bde7c"
+  integrity sha512-Ns7Bn9H/Tyw278+5SQx9oAblDZ7JixyzeOczcBK8dipQk2pD7Djkcfnf1nB/8RErAmMLL9iXgW0QHqiII8AhKw==
 
 react-native-url-polyfill@^2.0.0:
   version "2.0.0"

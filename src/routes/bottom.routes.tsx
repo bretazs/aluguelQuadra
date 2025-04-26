@@ -2,6 +2,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from '../pages/home';
 import User from '../pages/user';
 import Agendamento from '../components/Agendamento'
+import PreAgendamento from '../pages/PreAgendamento';
+import Agenda from "../pages/Agenda"
 import CustomTabBar from '../components/CustomTabBar';
 import { AuthProviderList } from '../context/authContext_list';
 
@@ -24,8 +26,16 @@ export default function BottomRoutes() {
           component={User} 
         />
         <Tab.Screen 
+          name="Agenda"
+          component={Agenda} 
+        />
+        <Tab.Screen 
           name="Agendamento"
           component={Agendamento} 
+        />
+        <Tab.Screen 
+          name="PreAgendamento"
+          component={PreAgendamento} 
         />
       </Tab.Navigator>
     </AuthProviderList>

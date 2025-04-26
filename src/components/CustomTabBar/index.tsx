@@ -31,7 +31,7 @@ export default ({ state, navigation }) => {
         />
         <Text style={{ color: "#fff", fontWeight: "bold" }}>Inicio</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={style.TabItem }  onPress={() => go("Agendamento")}>
+      <TouchableOpacity style={style.TabItem }  onPress={() => go("Agenda")}>
         <FontAwesome
           name="calendar"
           style={{

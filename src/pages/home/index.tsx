@@ -7,6 +7,7 @@ import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { Flag } from "../../components/Flag";
 import { themas } from "../../global/themes";
 import { AuthContextList } from "../../context/authContext_list";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import {
   Text,
   View,
@@ -27,8 +28,8 @@ import { useCallback } from "react";
 import { supabase } from "../../libs/supabase";
 import { useAuth } from "../../context/AuthContext";
 
-
 export default function Home() {
+  const navigation = useNavigation<NavigationProp<any>>();
   const { setAuth } = useAuth();
   const [user, setUser] = useState<any>(null);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -76,7 +77,7 @@ export default function Home() {
           month: "2-digit",
           year: "numeric",
         }),
-        data, 
+        data,
       });
     }
 
@@ -378,6 +379,14 @@ export default function Home() {
                         setQuadraSelecionadaItem(item);
                         setModalVisible(true);
 
+                        navigation.navigate("PreAgendamento", {
+                          quadra: item
+                        });
+                        useEffect(() => {
+                          if (quadraSelecionadaItem) {
+                            navigation.navigate("PreAgendamento", { quadra: quadraSelecionadaItem });
+                          }
+                        }, [quadraSelecionadaItem])
                         const { data, error } = await supabase
                           .from("horarios")
                           .select("*")
@@ -410,6 +419,8 @@ export default function Home() {
                       }}
                     >
                       <Text
+                        onPress={() => navigation.navigate("PreAgendamento", { quadra: item })
+                        }
                         style={{
                           color: "#fff",
                           fontWeight: "bold",
@@ -419,286 +430,6 @@ export default function Home() {
                         Selecionar
                       </Text>
                     </TouchableOpacity>
-
-                    <Modal
-                      animationType="fade"
-                      transparent={true}
-                      visible={modalVisible}
-                      onRequestClose={() => {
-                        setModalVisible(false);
-                        setQuadraSelecionadaItem(null);
-                      }}
-                    >
-                      <Pressable
-                        style={{
-                          flex: 1,
-                          backgroundColor: "rgba(0, 0, 0, 0.5)",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                        onPress={() => {
-                          setModalVisible(false);
-                          setQuadraSelecionadaItem(null);
-                        }}
-                      >
-                        <Pressable
-                          style={{
-                            backgroundColor: "white",
-                            padding: 20,
-                            borderRadius: 10,
-                            width: 300,
-                            alignItems: "center",
-                          }}
-                          onPress={(e) => e.stopPropagation()}
-                        >
-                          {quadraSelecionadaItem ? (
-                            <>
-                              <Text
-                                style={{ fontSize: 18, fontWeight: "bold" }}
-                              >
-                                Arena selecionada:
-                              </Text>
-                              <Text
-                                style={{ marginVertical: 10, fontSize: 18 }}
-                              >
-                                {local}
-                              </Text>
-
-                              {horarios && horarios.length > 0 ? (
-                                <>
-                                  <Text
-                                    style={{
-                                      fontSize: 18,
-                                      fontWeight: "bold",
-                                      marginBottom: 10,
-                                      color: "#1f222a",
-                                      alignSelf: "flex-start",
-                                    }}
-                                  >
-                                    Selecione uma data:
-                                  </Text>
-
-                                  <ScrollView
-                                    horizontal
-                                    showsHorizontalScrollIndicator={false}
-                                    style={{ marginBottom: 10 }}
-                                  >
-                                    {diasSemana.map((dia, index) => (
-                                      <TouchableOpacity
-                                        key={index}
-                                        onPress={() => setdiaSelecionado(dia)}
-                                        style={{
-                                          backgroundColor:
-                                            diaSelecionado?.dataFormatada ===
-                                            dia.dataFormatada
-                                              ? "#0fb0ff"
-                                              : "#f2f2f2",
-                                          paddingVertical: 12,
-                                          paddingHorizontal: 16,
-                                          marginRight: 8,
-                                          borderRadius: 20,
-                                          alignItems: "center",
-                                          borderWidth: 2,
-                                          borderColor:
-                                            diaSelecionado?.dataFormatada ===
-                                            dia.dataFormatada
-                                              ? "#00b0ff"
-                                              : "#ddd",
-                                        }}
-                                      >
-                                        <Text
-                                          style={{
-                                            fontWeight: "bold",
-                                            color:
-                                              diaSelecionado?.dataFormatada ===
-                                              dia.dataFormatada
-                                                ? "#fff"
-                                                : "#333",
-                                            fontSize: 12,
-                                          }}
-                                        >
-                                          {dia.diaSemana.toUpperCase()}
-                                        </Text>
-                                        <Text
-                                          style={{
-                                            color:
-                                              diaSelecionado?.dataFormatada ===
-                                              dia.dataFormatada
-                                                ? "#fff"
-                                                : "#333",
-                                          }}
-                                        >
-                                          {dia.dataFormatada.split("/")[0]}
-                                        </Text>
-                                      </TouchableOpacity>
-                                    ))}
-                                  </ScrollView>
-
-                                  <Text
-                                    style={{
-                                      fontSize: 18,
-                                      fontWeight: "bold",
-                                      marginBottom: 10,
-                                      color: "#1f222a",
-                                      alignSelf: "flex-start",
-                                    }}
-                                  >
-                                    Selecione um horário:
-                                  </Text>
-
-                                  <View
-                                    style={{
-                                      flexDirection: "row",
-                                      flexWrap: "wrap",
-                                      justifyContent: "center",
-                                    }}
-                                  >
-                                    <ScrollView
-                                      horizontal
-                                      showsHorizontalScrollIndicator={false}
-                                      style={{ marginBottom: 2 }}
-                                    >
-                                      {horarios.map((horario) => (
-                                        <TouchableOpacity
-                                          key={horario.id}
-                                          style={{
-                                            backgroundColor: "#1f3b51",
-                                            
-                                            paddingVertical: 14,
-                                            paddingHorizontal: 8,
-                                            borderRadius: 30,
-                                            marginHorizontal: 6,
-                                            alignItems: "center",
-                                          }}
-                                          onPress={() => {
-                                            setHorarioSelecionado(horario);
-                                            setAgendamentoConfirmado(false);
-                                          }}
-                                        >
-                                          {!agendamentoConfirmado && (
-                                            <Text
-                                              style={{
-                                                color: "#fff",
-                                                fontWeight: "bold",
-                                                fontSize: 14,
-                                              }}
-                                            >
-                                              {horario.horario}
-                                            </Text>
-                                          )}
-
-                                          {diaSelecionado &&
-                                            horarioSelecionado &&
-                                            !agendamentoConfirmado && (
-                                              <TouchableOpacity
-                                                onPress={() =>
-                                                  setAgendamentoConfirmado(true)
-                                                }
-                                               
-                                              >
-                                                
-                                              </TouchableOpacity>
-                                            )}
-
-                                          {agendamentoConfirmado && (
-                                            <View
-                                              style={{
-                                                marginTop: 20,
-                                                alignItems: "center",
-                                              }}
-                                            >
-                                              <Text
-                                                style={{
-                                                  color: "#00b0ff",
-                                                  fontWeight: "bold",
-                                                  fontSize: 16,
-                                                }}
-                                              >
-                                                Agendamento Salvo!
-                                              </Text>
-                                              <Text
-                                                style={{
-                                                  textAlign: "center",
-                                                  color: "#fff",
-                                                  marginTop: 4,
-                                                  fontSize: 8,
-                                                }}
-                                              >
-                                                Seu agendamento foi salvo com
-                                                sucesso.
-                                              </Text>
-                                            </View>
-                                          )}
-                                          
-                                        </TouchableOpacity>
-                                      ))}
-                                    </ScrollView>
-                                  </View>
-                                </>
-                              ) : (
-                                <Text style={{ marginVertical: 10 }}>
-                                  Nenhum horário disponível.
-                                </Text>
-                              )}
-
-                              {quadraSelecionadaItem.aula && (
-                                <View style={{ marginVertical: 10 }}>
-                                  <Text style={{ fontWeight: "bold" }}>
-                                    Aula:
-                                  </Text>
-                                  <Text>{quadraSelecionadaItem.aula}</Text>
-                                </View>
-                              )}
-
-                              {quadraSelecionadaItem.horario_disponivel && (
-                                <View style={{ marginVertical: 10 }}></View>
-                              )}
-
-                              {typeof quadraSelecionadaItem.max_pessoas ===
-                                "number" &&
-                                typeof quadraSelecionadaItem.pessoas_agendadas ===
-                                  "number" && (
-                                  <View style={{ marginVertical: 10 }}>
-                                    <Text style={{ fontWeight: "bold" }}>
-                                      Capacidade:
-                                    </Text>
-                                    <Text style={{ textAlign: "center" }}>
-                                      {quadraSelecionadaItem.pessoas_agendadas}{" "}
-                                      / {quadraSelecionadaItem.max_pessoas}
-                                    </Text>
-                                  </View>
-                                )}
-
-                              <TouchableOpacity
-                                onPress={() => {
-                                  setModalVisible(false);
-                                  setQuadraSelecionadaItem(null);
-                                }}
-                                style={{
-                                  backgroundColor: "#00b0ff",
-                                  paddingVertical: 6,
-                                  paddingHorizontal: 12,
-                                  borderRadius: 10,
-                                  marginTop: 10,
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    color: "#fff",
-                                    fontWeight: "bold",
-                                    fontSize: 12,
-                                  }}
-                                >
-                                  Fechar
-                                </Text>
-                              </TouchableOpacity>
-                            </>
-                          ) : (
-                            <ActivityIndicator size="small" color="#00b0ff" />
-                          )}
-                        </Pressable>
-                      </Pressable>
-                    </Modal>
                   </View>
                 </TouchableOpacity>
               )}

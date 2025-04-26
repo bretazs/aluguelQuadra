@@ -3,13 +3,28 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../pages/login";
 import Cadastro from "../pages/cadastro";
 import Home from "../pages/home";
-import Agendamento from "../components/Agendamento"
+import Agendamento from "../components/Agendamento";
+import PreAgendamento from "../pages/PreAgendamento";
+import Agenda from "../pages/Agenda";
 import BottomRoutes from "./bottom.routes";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import resetPassword from "../pages/resetPassword";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { supabase } from "../libs/supabase";
 import Sigin from "../pages/signin/page";
+
+
+type RootStackParamList = {
+  signin: undefined;
+  Login: undefined;
+  Home: undefined;
+  Cadastro: undefined;
+  resetPassword: undefined;
+  Agendamento: undefined;
+  PreAgendamento: undefined;
+  BottomRoutes: undefined;
+};
 
 export default function RootLayout() {
   return (
@@ -20,15 +35,15 @@ export default function RootLayout() {
 }
 
 function Routes() {
-  const navigation = useNavigation<NavigationProp<any>>();
-  const { setAuth, setAvatar } = useAuth(); 
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const { setAuth, setAvatar } = useAuth();
 
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session) {
-        setAuth(session.user); 
+        setAuth(session.user);
         fetchUserAvatar(session.user.id);
         navigation.reset({
           index: 0,
@@ -49,10 +64,10 @@ function Routes() {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         setAuth(session.user);
-        fetchUserAvatar(session.user.id); 
+        fetchUserAvatar(session.user.id);
       } else {
         setAuth(null);
-        setAvatar(null); 
+        setAvatar(null);
         navigation.reset({
           index: 0,
           routes: [{ name: "signin" }],
@@ -65,28 +80,29 @@ function Routes() {
     };
   }, []);
 
-  
   const fetchUserAvatar = async (userId: string) => {
     const { data, error } = await supabase
-      .from('users')
-      .select('avatar_url')
-      .eq('id', userId)
+      .from("users")
+      .select("avatar_url")
+      .eq("id", userId)
       .single();
 
     if (error) {
       console.error("Erro ao buscar avatar:", error);
     } else {
-      setAvatar(data?.avatar_url || null); 
+      setAvatar(data?.avatar_url || null);
     }
   };
 
-  const Stack = createStackNavigator();
+  const Stack = createStackNavigator<RootStackParamList>();
 
   return (
     <Stack.Navigator
       initialRouteName="Login"
       screenOptions={{
         headerShown: false,
+        gestureEnabled: true, 
+        gestureDirection: "horizontal", 
         cardStyle: {
           backgroundColor: "#FFF",
         },
@@ -98,6 +114,8 @@ function Routes() {
       <Stack.Screen name="Cadastro" component={Cadastro} />
       <Stack.Screen name="resetPassword" component={resetPassword} />
       <Stack.Screen name="Agendamento" component={Agendamento} />
+      <Stack.Screen name="Agenda" component={Agenda} />
+      <Stack.Screen name="PreAgendamento" component={PreAgendamento} />
       <Stack.Screen name="BottomRoutes" component={BottomRoutes} />
     </Stack.Navigator>
   );
